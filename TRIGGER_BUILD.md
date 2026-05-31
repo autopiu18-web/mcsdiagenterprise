@@ -1,5 +1,5 @@
-Trigger file to start GitHub Actions build
+Triggering CI re-run after workflow update.
 
-Timestamp: 2026-05-31T13:53:05.993+03:00
+Timestamp: 2026-05-31T13:56:00+03:00
 
-This commit intentionally triggers the Build Desktop (Windows) workflow.
+This commit will re-run the Build Desktop (Windows) workflow with Node.js 24 enforcement and NSIS installation step.
