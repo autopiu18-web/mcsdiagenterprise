@@ -8,6 +8,10 @@ on:
       - master
       - init-mcsdiagenterprise
 
+# Force Actions JS to Node 24 to avoid deprecation issues
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
 permissions:
   contents: read
 
@@ -17,11 +21,14 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 120
 
+    env:
+      NODE_OPTIONS: --max_old_space_size=4096
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js 24
         uses: actions/setup-node@v4
         with:
           node-version: '24'
@@ -30,6 +37,11 @@ jobs:
         run: |
           npm config set fund false
           npm config set audit false
+
+      - name: Ensure NSIS is installed (for electron-builder)
+        run: |
+          choco install nsis -y || echo "NSIS already installed"
+        shell: powershell
 
       - name: Install desktop dependencies
         working-directory: ./desktop
@@ -53,4 +65,3 @@ jobs:
           path: |
             desktop/release/**
             desktop/dist/**/
-
