@@ -1,0 +1,56 @@
+name: Build Desktop (Windows)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+      - init-mcsdiagenterprise
+
+permissions:
+  contents: read
+
+jobs:
+  build_windows:
+    name: Build Windows Portable EXE
+    runs-on: windows-latest
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Disable npm audit/fund messages
+        run: |
+          npm config set fund false
+          npm config set audit false
+
+      - name: Install desktop dependencies
+        working-directory: ./desktop
+        run: |
+          npm ci --no-audit --no-fund
+
+      - name: Build renderer and main
+        working-directory: ./desktop
+        run: |
+          npm run build
+
+      - name: Package Windows portable EXE (electron-builder)
+        working-directory: ./desktop
+        run: |
+          npm run dist:portable
+
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: mcs-desktop-windows
+          path: |
+            desktop/release/**
+            desktop/dist/**/
+
